@@ -7,13 +7,13 @@ use crossterm::{
       read,
       Event::*,
       KeyCode, 
-      poll
+      poll, KeyEvent
   },
   Result
 };
 
 pub struct Editor {
-
+  quit: bool
 }
 
 impl Editor {
@@ -21,46 +21,31 @@ impl Editor {
   pub fn new() -> Result<()> {
     TerminalFunctions::new();
 
-    Editor::input_event();
+    Editor::process_input();
 
     Ok(())
-
   }
 
-  fn input_event() { // Evento para registar cada ms que passou e as teclas que foram precionadas
-    let mut ms_count: i32 = 0;
+  fn process_input() {
     
+  }
+
+  fn input_event() -> Result<KeyEvent> { // Evento para registar cada ms que passou e as teclas que foram precionadas
+
     loop {
-      let mut key = None;
-      ms_count += 1;
       
-      match poll(Duration::from_millis(100)) {
-        Ok(true) => {
+      if poll(Duration::from_millis(100))? {
+
           if let Ok(event) = read() {
-            if let Key(key_event) = event {
-             key = Some(key_event)
+            if let Key(key_event) = event { 
+              return Ok(key_event);
             } 
           } else {
-           TerminalFunctions::die("Read Fail")
+           TerminalFunctions::die("Algo de errado ocorreu na leitura")
           }
-        }
-        Ok(false) => {}
-          _ => {
-            TerminalFunctions::die("Poll Fail")
-        }
-       }
 
-      if let Some(key) = key {
-          if key.code == KeyCode::Char('q') {
-              break;
-          } else { 
-              println!("{ms_count:4} {key:?}\r")
-          }
+        }
       }
-
-    }
-
-    TerminalFunctions::finish_raw_mode()    
   }
 
 }
