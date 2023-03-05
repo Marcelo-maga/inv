@@ -1,6 +1,6 @@
 
 // execute == lambda in python????
-use crossterm::{ terminal, execute };
+use crossterm::{ terminal, execute, Result };
 use errno::errno;
 use std::io::{ stdout };
 
@@ -9,8 +9,11 @@ pub struct TerminalFunctions {
 }
 
 impl TerminalFunctions {
-  pub fn new() {
+  pub fn new() -> Result<Self> {
     TerminalFunctions::start_raw_mode();
+
+    Ok(Self {  })
+
   }
 
   pub fn die<S: Into<String>>(message: S) { // Esteja sempre preparado ... para tudo!

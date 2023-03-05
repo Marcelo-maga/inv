@@ -13,37 +13,43 @@ use crossterm::{
 };
 
 pub struct Editor {
-  quit: bool
+  quit: bool,
+  terminal: TerminalFunctions
 }
 
 impl Editor {
 
-  pub fn new() -> Result<()> {
-    TerminalFunctions::new();
+  pub fn new() -> Result<Self> {
+    let terminal = TerminalFunctions::new()?;
 
-    Editor::process_input();
+    Ok(
+      Self {
+        quit: false,
+        terminal: terminal
+      }
+    )
 
-    Ok(())
   }
 
-  fn process_input() {
-    
+  pub fn run(&self) {
+    self.process_input()
   }
 
-  fn input_event() -> Result<KeyEvent> { // Evento para registar cada ms que passou e as teclas que foram precionadas
+  fn process_input(&self) {
+    let mut key = self.input_event();
+
+    println!("{:?}", key);
+  }
+
+  fn input_event(&self) -> Result<KeyEvent> { // Evento para registar cada ms que passou e as teclas que foram precionadas
 
     loop {
-      
       if poll(Duration::from_millis(100))? {
-
           if let Ok(event) = read() {
             if let Key(key_event) = event { 
               return Ok(key_event);
             } 
-          } else {
-           TerminalFunctions::die("Algo de errado ocorreu na leitura")
           }
-
         }
       }
   }

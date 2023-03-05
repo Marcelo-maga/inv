@@ -5,7 +5,11 @@ mod terminal_functions;
 
 use editor::{ Editor };
 
-// Todo => Condicional para iniciar somente se tudo estiver OK
 fn main() {
-  Editor::new();
-}
+
+  if let Ok(editor) = Editor::new() {
+    editor.run()
+  }
+
+
+} 
