@@ -3,6 +3,7 @@ use crossterm::{ Result };
 
 mod editor;
 mod terminal_functions;
+mod view;
 
 
 use editor::{ Editor };

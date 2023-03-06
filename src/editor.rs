@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use crate::terminal_functions::TerminalFunctions;
+use crate::view::View;
 
 use crossterm::{ 
   event::{ 
@@ -13,24 +14,27 @@ use crossterm::{
 };
 
 pub struct Editor {
-  terminal: TerminalFunctions
+  terminal: TerminalFunctions,
+  view: View
 }
 
 impl Editor {
 
   pub fn new() -> Result<Self> {
-    let terminal = TerminalFunctions::new()?;
+    let terminal = TerminalFunctions::new();
+    let view = View::new();
 
     Ok(
       Self {
-        terminal: terminal
+        terminal: terminal,
+        view: view
       }
     )
 
   }
 
   pub fn run(&self) -> Result<bool> {
-    TerminalFunctions::update_terminal();
+    self.view.refresh_screen();
     self.process_input()
   }
 
