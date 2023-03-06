@@ -6,6 +6,7 @@ mod terminal_functions;
 
 
 use editor::{ Editor };
+use terminal_functions::TerminalFunctions;
 
 fn main() -> Result<()> {
 
@@ -13,6 +14,8 @@ fn main() -> Result<()> {
     while editor.run()? {}
   }
 
-  Ok(())
+  Ok(
+    TerminalFunctions::finish_raw_mode()
+  )
 
 } 

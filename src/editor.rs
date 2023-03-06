@@ -7,13 +7,12 @@ use crossterm::{
       read,
       Event::*,
       KeyCode, 
-      poll, KeyEvent, self, KeyModifiers
+      poll, KeyEvent, KeyModifiers
   },
   Result
 };
 
 pub struct Editor {
-  quit: bool,
   terminal: TerminalFunctions
 }
 
@@ -24,19 +23,19 @@ impl Editor {
 
     Ok(
       Self {
-        quit: false,
         terminal: terminal
       }
     )
 
   }
 
-  pub fn run(&self) -> Result<bool>{
+  pub fn run(&self) -> Result<bool> {
+    TerminalFunctions::update_terminal();
     self.process_input()
   }
 
   fn process_input(&self) -> Result<bool>{
-    let mut key = self.input_event()?;
+    let key = self.input_event()?;
 
     if key.code == KeyCode::Char('q') && key.modifiers == KeyModifiers::CONTROL {
       Ok(false)
