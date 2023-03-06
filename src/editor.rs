@@ -7,7 +7,7 @@ use crossterm::{
       read,
       Event::*,
       KeyCode, 
-      poll, KeyEvent
+      poll, KeyEvent, self, KeyModifiers
   },
   Result
 };
@@ -31,27 +31,30 @@ impl Editor {
 
   }
 
-  pub fn run(&self) {
+  pub fn run(&self) -> Result<bool>{
     self.process_input()
   }
 
-  fn process_input(&self) {
-    let mut key = self.input_event();
+  fn process_input(&self) -> Result<bool>{
+    let mut key = self.input_event()?;
 
-    println!("{:?}", key);
-  }
+    if key.code == KeyCode::Char('q') && key.modifiers == KeyModifiers::CONTROL {
+      Ok(false)
+    } else {
+      Ok(true)
+    }
+  } 
 
   fn input_event(&self) -> Result<KeyEvent> { // Evento para registar cada ms que passou e as teclas que foram precionadas
-
     loop {
       if poll(Duration::from_millis(100))? {
-          if let Ok(event) = read() {
-            if let Key(key_event) = event { 
-              return Ok(key_event);
-            } 
-          }
+        if let Ok(event) = read() {
+          if let Key(key_event) = event { 
+            return Ok(key_event);
+          } 
         }
       }
+    }
   }
 
 }

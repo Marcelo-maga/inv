@@ -1,3 +1,5 @@
+use crossterm::{ Result };
+
 
 mod editor;
 mod terminal_functions;
@@ -5,11 +7,12 @@ mod terminal_functions;
 
 use editor::{ Editor };
 
-fn main() {
+fn main() -> Result<()> {
 
   if let Ok(editor) = Editor::new() {
-    editor.run()
+    while editor.run()? {}
   }
 
+  Ok(())
 
 } 
