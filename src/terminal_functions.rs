@@ -1,20 +1,25 @@
 
 // execute == lambda in python????
-use crossterm::terminal::ClearType;
-use crossterm::{ terminal, execute, Result };
+use crossterm::{ terminal, execute };
 use errno::errno;
 use std::io::{ stdout };
 
 pub struct TerminalFunctions {
-  
+  pub win_size: (usize, usize)
 }
 
 impl TerminalFunctions {
-  pub fn new() -> Result<Self> {
+  pub fn new() -> Self {
     TerminalFunctions::start_raw_mode();
 
-    Ok(Self {  })
+    let win_size = terminal::size()
+    .map(|(x, y)| (x as usize, y as usize))
+    .unwrap(); 
+    
 
+    Self {
+      win_size: win_size
+    }
   }
 
   pub fn die<S: Into<String>>(message: S) { // Esteja sempre preparado ... para tudo!
@@ -28,9 +33,6 @@ impl TerminalFunctions {
     execute!(stdout(), terminal::EnterAlternateScreen).unwrap() // Função para abrir uma nova "tela" obrigado Ox
   }
 
-  pub fn update_terminal() -> Result<()> {
-    execute!(stdout(), terminal::Clear(ClearType::All))
-  }
 
   pub fn finish_raw_mode() {
     let _  = terminal::disable_raw_mode();

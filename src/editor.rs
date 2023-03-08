@@ -22,7 +22,7 @@ impl Editor {
 
   pub fn new() -> Result<Self> {
     let terminal = TerminalFunctions::new();
-    let view = View::new();
+    let view = View::new(terminal.win_size);
 
     Ok(
       Self {
