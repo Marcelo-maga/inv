@@ -35,7 +35,8 @@ impl TerminalFunctions {
 
 
   pub fn finish_raw_mode() {
-    let _  = terminal::disable_raw_mode();
+    terminal::Clear(terminal::ClearType::All);
+    terminal::disable_raw_mode();
   }
 
 }

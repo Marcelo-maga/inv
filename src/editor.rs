@@ -33,10 +33,11 @@ impl Editor {
 
   }
 
-  pub fn run(&self) -> Result<bool> {
+  pub fn run(&mut self) -> Result<bool> {
     self.view.refresh_screen();
     self.process_input()
   }
+
 
   fn process_input(&self) -> Result<bool>{
     let key = self.input_event()?;
@@ -48,7 +49,7 @@ impl Editor {
     }
   } 
 
-  fn input_event(&self) -> Result<KeyEvent> { // Evento para registar cada ms que passou e as teclas que foram precionadas
+  fn input_event(&self) -> Result<KeyEvent> {
     loop {
       if poll(Duration::from_millis(100))? {
         if let Ok(event) = read() {
