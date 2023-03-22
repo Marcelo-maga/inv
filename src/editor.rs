@@ -39,14 +39,26 @@ impl Editor {
   }
 
 
-  fn process_input(&self) -> Result<bool>{
-    let key = self.input_event()?;
+  fn process_input(&mut self) -> Result<bool>{
+    match self.input_event()? {
+        KeyEvent {
+          code: KeyCode::Char('q'),
+          modifiers: KeyModifiers::CONTROL,
+          kind,
+          state,
+        } => return Ok(false),
 
-    if key.code == KeyCode::Char('q') && key.modifiers == KeyModifiers::CONTROL {
-      Ok(false)
-    } else {
-      Ok(true)
+        KeyEvent {
+          code: KeyCode::Char(val @ ('w' | 'a' | 's' | 'd')),
+          modifiers: KeyModifiers::NONE,
+          kind,
+          state,
+        } => self.view.move_cursor(val),
+
+        _ => {}
     }
+
+    Ok(true)
   } 
 
   fn input_event(&self) -> Result<KeyEvent> {
@@ -60,5 +72,4 @@ impl Editor {
       }
     }
   }
-
 }
