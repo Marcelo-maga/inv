@@ -1,7 +1,7 @@
 use crossterm::{
     cursor, execute, queue,
     terminal::{self, ClearType},
-    Result,
+    Result, event::KeyCode,
 };
 use std::io::{stdout, Write};
 
@@ -17,18 +17,18 @@ impl EditorCursor {
         Self { x: 0, y: 0 }
     }
 
-    fn move_cursor(&mut self, direction: char) {
+    fn move_cursor(&mut self, direction: KeyCode) {
         match direction {
-            'w' => {
+            KeyCode::Up => {
                 self.y -= 1;
             }
-            'a' => {
+            KeyCode::Left => {
                 self.x -= 1;
             }
-            's' => {
+            KeyCode::Down => {
                 self.y += 1;
             }
-            'd' => {
+            KeyCode::Right => {
                 self.x += 1;
             }
             _ => unimplemented!(),
@@ -53,7 +53,7 @@ impl View {
         }
     }
 
-    pub fn move_cursor(&mut self, direction: char) {
+    pub fn move_cursor(&mut self, direction: KeyCode) {
         self.cursor.move_cursor(direction)
     }
 

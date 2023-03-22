@@ -34,11 +34,11 @@ impl Editor {
   }
 
   pub fn run(&mut self) -> Result<bool> {
-    self.view.refresh_screen();
+    self.view.refresh_screen()?;
     self.process_input()
   }
 
-
+  // Pensar em uma forma de fazer dentro do arquivo de config que vc ainda vai fazer
   fn process_input(&mut self) -> Result<bool>{
     match self.input_event()? {
         KeyEvent {
@@ -49,11 +49,11 @@ impl Editor {
         } => return Ok(false),
 
         KeyEvent {
-          code: KeyCode::Char(val @ ('w' | 'a' | 's' | 'd')),
+          code: direction @ (KeyCode::Up | KeyCode::Down | KeyCode::Left | KeyCode::Right),
           modifiers: KeyModifiers::NONE,
           kind,
           state,
-        } => self.view.move_cursor(val),
+        } => self.view.move_cursor(direction),
 
         _ => {}
     }
