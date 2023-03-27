@@ -1,4 +1,4 @@
-use std::io::{Write, self, stdout};
+use std::io::{ self, stdout};
 
 pub struct Buffer {
     lines: String,

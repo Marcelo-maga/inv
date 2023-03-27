@@ -1,4 +1,3 @@
-
 // execute == lambda in python????
 use crossterm::{ terminal, execute };
 use errno::errno;
@@ -16,7 +15,6 @@ impl TerminalFunctions {
     .map(|(x, y)| (x as usize, y as usize))
     .unwrap(); 
     
-
     Self {
       win_size: win_size
     }

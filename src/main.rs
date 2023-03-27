@@ -5,6 +5,7 @@ mod editor;
 mod terminal_functions;
 mod view;
 mod buffer;
+mod rows;
 
 
 use editor::{ Editor };
@@ -16,8 +17,6 @@ fn main() -> Result<()> {
     while editor.run()? {}
   }
 
-  Ok(
-    TerminalFunctions::finish_raw_mode()
-  )
+  Ok(TerminalFunctions::finish_raw_mode())
 
 } 
