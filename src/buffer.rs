@@ -18,10 +18,6 @@ impl Buffer {
     pub fn push_ch(&mut self, string: char) {
         self.lines.push(string)
     }
-    
-    pub fn num_rows(&self) -> usize {
-        self.lines.len()
-    }
 }
 
 

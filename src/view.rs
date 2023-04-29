@@ -6,13 +6,14 @@ use crossterm::{
 use std::io::{ Write };
 use std::cmp;
 
-use crate::{ buffer::Buffer, rows::Row };
+use crate::{ buffer::Buffer, rows::Row, editor };
 
 struct EditorCursor {
     x: usize,
     y: usize,
     screen_columns: usize,
-    screen_rows: usize
+    screen_rows: usize,
+    off_screen: usize
 }
 
 impl EditorCursor {
@@ -21,13 +22,14 @@ impl EditorCursor {
             x: 0, 
             y: 0,
             screen_columns: screen_columns,
-            screen_rows: screen_rows
+            screen_rows: screen_rows,
+            off_screen: 0
         }
     }
 
     // Implementar uma keybind, e usar control e as teclas do VIM
     // pela quantidade de atalhos, isso tera que ser uma impl 
-    fn move_cursor(&mut self, direction: KeyCode) {
+    fn move_cursor(&mut self, direction: KeyCode, number_of_rows: usize) {
         match direction {
             KeyCode::Up => {
                 self.y = self.y.saturating_sub(1);
@@ -48,6 +50,13 @@ impl EditorCursor {
                 }
             }
             _ => unimplemented!(),
+        }
+    }
+
+    fn scroll(&mut self) {
+        self.off_screen = cmp::min(self.off_screen, self.y);
+        if self.y >= self.off_screen + self.screen_rows {
+            self.off_screen = self.y - self.screen_rows + 1;
         }
     }
 }
@@ -73,22 +82,23 @@ impl View {
         }
     }
 
-    pub fn move_cursor(&mut self, direction: KeyCode) {
-        self.cursor.move_cursor(direction)
+    pub fn move_cursor(&mut self, direction: KeyCode, number_of_row: usize) {
+        self.cursor.move_cursor(direction, number_of_row)
     }
 
     pub fn refresh_screen(&mut self) -> Result<()> {
         self.update_terminal()
     }
 
-    fn draw_rows(&mut self) {
+    fn draw_rows(&mut self) {   
         let screen_columns = self.win_size.0;
         let screen_rows = self.win_size.1;
 
         for row in 0..screen_rows {
-            if row >= self.row.number_of_rows() {
-                if row == screen_rows / 3 {
-                    let mut message = format!("Bem-vindo ao Inv ❤️");
+            let file_row = row + self.cursor.off_screen;
+            if file_row >= self.row.number_of_rows() {
+                if self.row.number_of_rows() == 0 && row == screen_rows / 3 {
+                    let mut message = format!("Inv");
     
                     if message.len() > screen_columns {
                         message.truncate(screen_columns)
@@ -107,7 +117,8 @@ impl View {
                     self.buffer.push_ch('~')
                 }
             } else {
-                let len = cmp::min(self.row.get_row(row).len(), screen_columns); // modify
+                let len = cmp::min(self.row.get_row(file_row).len(), screen_columns);
+                // let row_string = format!("{} | {}", row+1, &self.row.get_row(row)[..len]);
                 self.buffer
                     .push_str(&self.row.get_row(row)[..len])
             }
@@ -121,16 +132,17 @@ impl View {
     }
 
     fn update_terminal(&mut self) -> Result<()> {
+        self.cursor.scroll();
         execute!(self.buffer, cursor::Hide, cursor::MoveTo(0, 0))?;
         
-        let cursor_x = self.cursor.x as u16;
-        let cursor_y = self.cursor.y as u16;
+        let cursor_x = self.cursor.x;
+        let cursor_y = self.cursor.y - self.cursor.off_screen;
         
         self.draw_rows();
 
         queue!(
             self.buffer,
-            cursor::MoveTo(cursor_x, cursor_y), 
+            cursor::MoveTo(cursor_x as u16, cursor_y as u16), 
             cursor::Show
         )?;
 

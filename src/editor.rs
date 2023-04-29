@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::terminal_functions::TerminalFunctions;
+use crate::{terminal_functions::TerminalFunctions, rows::Row};
 use crate::view::View;
 
 use crossterm::{ 
@@ -15,7 +15,8 @@ use crossterm::{
 
 pub struct Editor {
   terminal: TerminalFunctions,
-  view: View
+  view: View,
+  row: Row
 }
 
 impl Editor {
@@ -23,11 +24,13 @@ impl Editor {
   pub fn new() -> Result<Self> {
     let terminal = TerminalFunctions::new();
     let view = View::new(terminal.win_size);
+    let row = Row::new();
 
     Ok(
       Self {
         terminal: terminal,
-        view: view
+        view: view,
+        row: row
       }
     )
 
@@ -53,7 +56,7 @@ impl Editor {
           modifiers: KeyModifiers::NONE,
           kind,
           state,
-        } => self.view.move_cursor(direction),
+        } => self.view.move_cursor(direction, self.row.number_of_rows()),
 
         _ => {}
     }
@@ -66,6 +69,7 @@ impl Editor {
       if poll(Duration::from_millis(100))? {
         if let Ok(event) = read() {
           if let Key(key_event) = event { 
+            // println!("{}", self.row.number_of_rows());
             return Ok(key_event);
           } 
         }

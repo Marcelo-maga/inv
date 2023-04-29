@@ -1,4 +1,4 @@
-use std::{cmp, env, fs, io, path::Path};
+use std::{ env, fs, path::Path};
 
 pub struct Row {
     row_contents: Vec<Box<str>>
@@ -24,10 +24,10 @@ impl Row {
     }
 
     pub fn number_of_rows(&self) -> usize {
-        self.row_contents.len() /* modify */
+        self.row_contents.len()
     }
 
     pub fn get_row(&self, at:usize) -> &str {
-        &self.row_contents[at] /* modify */
+        &self.row_contents[at]
     }
 }
