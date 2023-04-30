@@ -40,8 +40,11 @@ impl EditorCursor {
                 self.y = self.y.saturating_sub(1);
             }
             KeyCode::Left => {
-                if self.x != 0 {
+                if self.x > 0 {
                     self.x -= 1;
+                } else {
+                    self.y -= 1;
+                    self.x = row.get_row(self.y).len();
                 }
             }
             KeyCode::Down => {
