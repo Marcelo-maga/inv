@@ -43,6 +43,8 @@ impl Editor {
 
   // Pensar em uma forma de fazer dentro do arquivo de config que vc ainda vai fazer
   fn process_input(&mut self) -> Result<bool>{
+    let row_cu = &self.row;
+
     match self.input_event()? {
         KeyEvent {
           code: KeyCode::Char('q'),
@@ -56,7 +58,7 @@ impl Editor {
           modifiers: KeyModifiers::NONE,
           kind,
           state,
-        } => self.view.move_cursor(direction, self.row.number_of_rows()),
+        } => self.view.move_cursor(direction, row_cu),
 
         _ => {}
     }

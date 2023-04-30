@@ -6,14 +6,15 @@ use crossterm::{
 use std::io::{ Write };
 use std::cmp;
 
-use crate::{ buffer::Buffer, rows::Row, editor };
+use crate::{ buffer::Buffer, rows::Row };
 
 struct EditorCursor {
     x: usize,
     y: usize,
     screen_columns: usize,
     screen_rows: usize,
-    off_screen: usize
+    y_off_screen: usize,
+    x_off_screen: usize
 }
 
 impl EditorCursor {
@@ -23,13 +24,17 @@ impl EditorCursor {
             y: 0,
             screen_columns: screen_columns,
             screen_rows: screen_rows,
-            off_screen: 0
+            y_off_screen: 0,
+            x_off_screen: 0
         }
     }
 
     // Implementar uma keybind, e usar control e as teclas do VIM
     // pela quantidade de atalhos, isso tera que ser uma impl 
-    fn move_cursor(&mut self, direction: KeyCode, number_of_rows: usize) {
+    fn move_cursor(&mut self, direction: KeyCode, row: &Row) {
+        let number_of_rows = row.number_of_rows();
+
+
         match direction {
             KeyCode::Up => {
                 self.y = self.y.saturating_sub(1);
@@ -45,8 +50,11 @@ impl EditorCursor {
                 }
             }
             KeyCode::Right => {
-                if self.x != self.screen_columns - 1 {
+                if self.y < number_of_rows && self.x < row.get_row(self.y).len() {
                     self.x += 1;
+                } else {
+                    self.y += 1;
+                    self.x = 0;
                 }
             }
             _ => unimplemented!(),
@@ -54,9 +62,14 @@ impl EditorCursor {
     }
     
     fn scroll(&mut self) {
-        self.off_screen = cmp::min(self.off_screen, self.y);
-        if self.y >= self.off_screen + self.screen_rows {
-            self.off_screen = self.y - self.screen_rows + 1;
+        self.y_off_screen = cmp::min(self.y_off_screen, self.y);
+        if self.y >= self.y_off_screen + self.screen_rows {
+            self.y_off_screen = self.y - self.screen_rows + 1;
+        }
+
+        self.x_off_screen = cmp::min(self.x_off_screen, self.x);
+        if self.x >= self.x_off_screen + self.screen_rows {
+            self.x_off_screen = self.x - self.screen_rows + 1;
         }
     }
 }
@@ -86,8 +99,8 @@ impl View {
         self.update_terminal()
     }
 
-    pub fn move_cursor(&mut self, direction: KeyCode, number_of_row: usize) {
-        self.cursor.move_cursor(direction, number_of_row)
+    pub fn move_cursor(&mut self, direction: KeyCode, row: &Row) {
+        self.cursor.move_cursor(direction, row)
     }
 
 
@@ -96,7 +109,7 @@ impl View {
         let screen_rows = self.win_size.1;
 
         for row in 0..screen_rows {
-            let file_row = row + self.cursor.off_screen;
+            let file_row = row + self.cursor.y_off_screen;
             if file_row >= self.row.number_of_rows() {
                 if self.row.number_of_rows() == 0 && row == screen_rows / 3 {
                     let mut message = format!("Inv");
@@ -118,10 +131,26 @@ impl View {
                     self.buffer.push_ch('~')
                 }
             } else {
-                let len = cmp::min(self.row.get_row(file_row).len(), screen_columns);
+                let row = self.row.get_row(file_row);
+                let column_offset = self.cursor.x_off_screen;
+                
+                let len = if row.len() < column_offset {
+                    0
+                } else {
+                    let len = row.len() - column_offset;
+
+                    if len > screen_columns {
+                        len - screen_columns
+                    } else {
+                        len
+                    }
+                };
+
+                let start = if len == 0 { 0 } else { column_offset };
+                
+
                 // let row_string = format!("{} | {}", row+1, &self.row.get_row(row)[..len]);
-                self.buffer
-                    .push_str(&self.row.get_row(file_row)[..len])
+                self.buffer.push_str(&row[start..start + len]);
             }
     
             queue!(self.buffer, terminal::Clear(ClearType::UntilNewLine)).unwrap();
@@ -136,8 +165,8 @@ impl View {
         self.cursor.scroll();
         execute!(self.buffer, cursor::Hide, cursor::MoveTo(0, 0))?;
         
-        let cursor_x = self.cursor.x;
-        let cursor_y = self.cursor.y - self.cursor.off_screen;
+        let cursor_x = self.cursor.x - self.cursor.x_off_screen;
+        let cursor_y = self.cursor.y - self.cursor.y_off_screen;
         
         self.draw_rows();
 
