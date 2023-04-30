@@ -17,6 +17,8 @@ fn main() -> Result<()> {
     while editor.run()? {}
   }
 
-  Ok(TerminalFunctions::finish_raw_mode())
+  TerminalFunctions::finish_raw_mode();
+
+  Ok(TerminalFunctions::clear_terminal())
 
 } 

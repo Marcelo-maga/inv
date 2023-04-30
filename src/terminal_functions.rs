@@ -37,4 +37,8 @@ impl TerminalFunctions {
     terminal::disable_raw_mode();
   }
 
+  pub fn clear_terminal() {
+    print!("\x1b[2J \x1b[H");
+  }
+
 }
