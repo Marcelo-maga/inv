@@ -40,7 +40,7 @@ impl EditorCursor {
                 }
             }
             KeyCode::Down => {
-                if self.y != self.screen_rows - 1 {
+                if self.y < number_of_rows {
                     self.y += 1;
                 }
             }
@@ -52,7 +52,7 @@ impl EditorCursor {
             _ => unimplemented!(),
         }
     }
-
+    
     fn scroll(&mut self) {
         self.off_screen = cmp::min(self.off_screen, self.y);
         if self.y >= self.off_screen + self.screen_rows {
@@ -82,13 +82,14 @@ impl View {
         }
     }
 
+    pub fn refresh_screen(&mut self) -> Result<()> {
+        self.update_terminal()
+    }
+
     pub fn move_cursor(&mut self, direction: KeyCode, number_of_row: usize) {
         self.cursor.move_cursor(direction, number_of_row)
     }
 
-    pub fn refresh_screen(&mut self) -> Result<()> {
-        self.update_terminal()
-    }
 
     fn draw_rows(&mut self) {   
         let screen_columns = self.win_size.0;
@@ -120,7 +121,7 @@ impl View {
                 let len = cmp::min(self.row.get_row(file_row).len(), screen_columns);
                 // let row_string = format!("{} | {}", row+1, &self.row.get_row(row)[..len]);
                 self.buffer
-                    .push_str(&self.row.get_row(row)[..len])
+                    .push_str(&self.row.get_row(file_row)[..len])
             }
     
             queue!(self.buffer, terminal::Clear(ClearType::UntilNewLine)).unwrap();
