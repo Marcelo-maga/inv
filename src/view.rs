@@ -134,13 +134,13 @@ impl View {
                     self.buffer.push_ch('~')
                 }
             } else {
-                let row = self.row.get_row(file_row);
+                let row_string = self.row.get_row(file_row);
                 let column_offset = self.cursor.x_off_screen;
                 
-                let len = if row.len() < column_offset {
+                let len = if row_string.len() < column_offset {
                     0
                 } else {
-                    let len = row.len() - column_offset;
+                    let len = row_string.len() - column_offset;
 
                     if len > screen_columns {
                         len - screen_columns
@@ -152,8 +152,10 @@ impl View {
                 let start = if len == 0 { 0 } else { column_offset };
                 
 
-                // let row_string = format!("{} | {}", row+1, &self.row.get_row(row)[..len]);
-                self.buffer.push_str(&row[start..start + len]);
+                // let row_string = format!("{}  {}", row+1, &row_string[start..start + len]);
+                
+                let row_string = format!("{}", &row_string[start..start + len]);
+                self.buffer.push_str(&row_string);
             }
     
             queue!(self.buffer, terminal::Clear(ClearType::UntilNewLine)).unwrap();
@@ -182,4 +184,3 @@ impl View {
         self.buffer.flush()
     }
 }
-
