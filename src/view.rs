@@ -40,9 +40,9 @@ impl EditorCursor {
                 self.y = self.y.saturating_sub(1);
             }
             KeyCode::Left => {
-                if self.x > 0 {
+                if self.x != 0 {
                     self.x -= 1;
-                } else {
+                } else if self.y > 0{
                     self.y -= 1;
                     self.x = row.get_row(self.y).len();
                 }
@@ -153,7 +153,7 @@ impl View {
                 
 
                 // let row_string = format!("{}  {}", row+1, &row_string[start..start + len]);
-                
+
                 let row_string = format!("{}", &row_string[start..start + len]);
                 self.buffer.push_str(&row_string);
             }
