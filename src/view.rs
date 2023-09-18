@@ -3,7 +3,7 @@ use crossterm::{
     terminal::{self, ClearType},
     Result, event::KeyCode,
 };
-use std::io::{ Write };
+use std::io::Write;
 use std::cmp;
 
 use crate::{ buffer::Buffer, rows::Row };

@@ -1,7 +1,7 @@
 // execute == lambda in python????
 use crossterm::{ terminal, execute };
 use errno::errno;
-use std::io::{ stdout };
+use std::io::stdout;
 
 pub struct TerminalFunctions {
   pub win_size: (usize, usize)
@@ -34,7 +34,7 @@ impl TerminalFunctions {
 
   pub fn finish_raw_mode() {
     terminal::Clear(terminal::ClearType::All);
-    terminal::disable_raw_mode();
+    let _ = terminal::disable_raw_mode();
   }
 
   pub fn clear_terminal() {

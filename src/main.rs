@@ -1,4 +1,4 @@
-use crossterm::{ Result };
+use crossterm::Result;
 
 
 mod editor;
@@ -8,7 +8,7 @@ mod buffer;
 mod rows;
 
 
-use editor::{ Editor };
+use editor::Editor;
 use terminal_functions::TerminalFunctions;
 
 fn main() -> Result<()> {
