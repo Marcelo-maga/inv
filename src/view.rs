@@ -42,6 +42,7 @@ impl EditorCursor {
             KeyCode::Left => {
                 if self.x != 0 {
                     self.x -= 1;
+                    
                 } else if self.y > 0{
                     self.y -= 1;
                     self.x = row.get_row(self.y).len();
@@ -55,9 +56,6 @@ impl EditorCursor {
             KeyCode::Right => {
                 if self.y < number_of_rows && self.x < row.get_row(self.y).len() {
                     self.x += 1;
-                } else {
-                    self.y += 1;
-                    self.x = 0;
                 }
             }
             _ => unimplemented!(),
