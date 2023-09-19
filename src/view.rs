@@ -35,6 +35,7 @@ impl EditorCursor {
     // pela quantidade de atalhos, isso tera que ser uma impl
     fn move_cursor(&mut self, direction: KeyCode, row: &Row) {
         let number_of_rows = row.number_of_rows();
+        let number_of_chars = row.number_of_chars(self.y);
 
         match direction {
             KeyCode::Up => {
@@ -51,7 +52,7 @@ impl EditorCursor {
             }
 
             KeyCode::Down => {
-                if self.y < number_of_rows {
+                if self.y < number_of_rows-1 {
                     self.y += 1;
                 }
             }
@@ -114,9 +115,10 @@ impl View {
     pub fn remove_char(&mut self) {
         self.row.remove_char(self.cursor.y, self.cursor.x-1);
 
-        if self.cursor.x > self.row.number_of_chars(self.cursor.y) {
+        if self.cursor.x < self.row.number_of_chars(self.cursor.y) {
             self.cursor.y -= 1;
             self.cursor.x = self.row.number_of_chars(self.cursor.y);
+            
         } else {
             self.cursor.x -= 1;
         }
@@ -166,7 +168,7 @@ impl View {
 
                 let start = if len == 0 { 0 } else { column_offset };
 
-                // let row_string = format!("{}  {}", row+1, &row_string[start..start + len]);
+                // let row_string = format!("{} | {}", row+1, &row_string[start..start + len]);
 
                 let row_string = format!("{}", &row_string[start..start + len]);
                 self.buffer.push_str(&row_string);

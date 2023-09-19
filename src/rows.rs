@@ -1,7 +1,9 @@
 use std::{env, fs, path::Path};
+use crate::buffer::Buffer;
 
 pub struct Row {
     row_contents: Vec<Box<str>>,
+    buffer: Buffer,
 }
 
 impl Row {
@@ -9,9 +11,13 @@ impl Row {
         let mut arg = env::args();
 
         match arg.nth(1) {
+
             None => Self {
                 row_contents: Vec::new(),
+                buffer: Buffer::new(),
+                
             },
+            
             Some(file) => Self::from_file(file.as_ref()),
         }
     }
@@ -20,6 +26,7 @@ impl Row {
         let file_contents = fs::read_to_string(file).expect("Unable to read file");
         Self {
             row_contents: file_contents.lines().map(|it| it.into()).collect(),
+            buffer: Buffer::new(),
         }
     }
 
@@ -38,6 +45,7 @@ impl Row {
     pub fn insert_char(&mut self, y: usize, x:usize, char_insert: char) {
         let mut row = self.row_contents[y].to_string();
         row.insert(x, char_insert);
+        self.buffer.push_str(&row);
         self.row_contents[y] = row.into();
     }
 
@@ -46,6 +54,7 @@ impl Row {
     
         if x < row.len() {
             row.remove(x);
+            self.buffer.push_str(&row);
             self.row_contents[y] = row.into();
         }
     
@@ -53,5 +62,5 @@ impl Row {
             self.row_contents.remove(y);
         }
     }
-
+    
 }
