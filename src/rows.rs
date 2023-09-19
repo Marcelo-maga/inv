@@ -41,15 +41,6 @@ impl Row {
         self.row_contents[y] = row.into();
     }
 
-    // pub fn remove_char(&mut self, y: usize, x: usize) {
-    //     let mut row = self.row_contents[y].to_string();
-
-    //     if x < row.len() {
-    //         row.remove(x);
-    //         self.row_contents[y] = row.into();
-    //     }
-    // }
-
     pub fn remove_char(&mut self, y: usize, x: usize) {
         let mut row = self.row_contents[y].to_string();
     
