@@ -52,7 +52,7 @@ impl EditorCursor {
             }
 
             KeyCode::Down => {
-                if self.y < number_of_rows-1 {
+                if self.y < number_of_rows - 1 {
                     self.y += 1;
                 }
             }
@@ -113,14 +113,18 @@ impl View {
     }
 
     pub fn remove_char(&mut self) {
-        self.row.remove_char(self.cursor.y, self.cursor.x-1);
-
-        if self.cursor.x < self.row.number_of_chars(self.cursor.y) {
+        if self.cursor.x > 0 {
+            if self.row.number_of_chars(self.cursor.y) > 0 {
+                self.row.remove_char(self.cursor.y, self.cursor.x - 1);
+            }
+            self.cursor.x -= 1;
+        } else if self.cursor.y > 0 {
             self.cursor.y -= 1;
             self.cursor.x = self.row.number_of_chars(self.cursor.y);
-            
-        } else {
-            self.cursor.x -= 1;
+
+            if self.row.number_of_chars(self.cursor.y) > 0 {
+                self.row.remove_char(self.cursor.y, self.cursor.x - 1);
+            }
         }
     }
 
