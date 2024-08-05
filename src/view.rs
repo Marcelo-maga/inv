@@ -5,91 +5,14 @@ use crossterm::{
     terminal::{self, ClearType},
     Result,
 };
-use std::cmp;
 use std::io::Write;
 
-use crate::{buffer::Buffer, rows::Row};
-
-struct EditorCursor {
-    x: usize,
-    y: usize,
-    screen_columns: usize,
-    screen_rows: usize,
-    y_off_screen: usize,
-    x_off_screen: usize,
-}
-
-impl EditorCursor {
-    fn new(screen_columns: usize, screen_rows: usize) -> Self {
-        Self {
-            x: 0,
-            y: 0,
-            screen_columns: screen_columns,
-            screen_rows: screen_rows,
-            y_off_screen: 0,
-            x_off_screen: 0,
-        }
-    }
-
-    pub fn update_number_of_rows() {}
-
-    // Implementar uma keybind, e usar control e as teclas do VIM
-    // pela quantidade de atalhos, isso tera que ser uma impl
-    fn move_cursor(&mut self, direction: KeyCode, row: &Row) {
-        let number_of_rows = row.number_of_rows();
-        let number_of_chars = row.number_of_chars(self.y);
-
-        match direction {
-            KeyCode::Up => {
-                self.y = self.y.saturating_sub(1);
-            }
-
-            KeyCode::Left => {
-                if self.x != 0 {
-                    self.x -= 1;
-                } else if self.y > 0 {
-                    self.y -= 1;
-                    self.x = row.get_row(self.y).len();
-                }
-            }
-
-            KeyCode::Down => {
-                if self.y < number_of_rows - 1 {
-                    self.y += 1;
-                } else {
-                    self.y = number_of_rows - 1;
-                }
-            }
-
-            KeyCode::Right => {
-                if self.y < number_of_rows && self.x < row.get_row(self.y).len() {
-                    self.x += 1;
-                } else if self.x == number_of_chars && self.y != number_of_rows - 1 {
-                    self.y += 1;
-                    self.x = 0;
-                }
-            }
-            _ => unimplemented!(),
-        }
-    }
-
-    fn scroll(&mut self) {
-        self.y_off_screen = cmp::min(self.y_off_screen, self.y);
-        if self.y >= self.y_off_screen + self.screen_rows {
-            self.y_off_screen = self.y - self.screen_rows + 1;
-        }
-
-        self.x_off_screen = cmp::min(self.x_off_screen, self.x);
-        if self.x >= self.x_off_screen + self.screen_rows {
-            self.x_off_screen = self.x - self.screen_rows + 1;
-        }
-    }
-}
+use crate::{buffer::Buffer, cursor::Cursor, rows::Row};
 
 pub struct View {
     win_size: (usize, usize),
     buffer: Buffer,
-    cursor: EditorCursor,
+    cursor: Cursor,
     row: Row,
 }
 
@@ -101,7 +24,7 @@ impl View {
         Self {
             win_size: win_size,
             buffer: buffer,
-            cursor: EditorCursor::new(win_size.0, win_size.1),
+            cursor: Cursor::new(win_size.0, win_size.1),
             row: row,
         }
     }
@@ -111,7 +34,7 @@ impl View {
     }
 
     pub fn move_cursor(&mut self, direction: KeyCode, row: &Row) {
-        self.cursor.move_cursor(direction, row)
+        self.cursor.move_cursor(direction, row);
     }
 
     pub fn insert_char(&mut self, c: char) {

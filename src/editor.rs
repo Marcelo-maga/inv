@@ -63,7 +63,6 @@ impl Editor {
                 state: _,
             } => self.view.remove_char(),
 
-
             _ => {}
         }
 
