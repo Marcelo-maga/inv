@@ -31,6 +31,8 @@ impl EditorCursor {
         }
     }
 
+    pub fn update_number_of_rows() {}
+
     // Implementar uma keybind, e usar control e as teclas do VIM
     // pela quantidade de atalhos, isso tera que ser uma impl
     fn move_cursor(&mut self, direction: KeyCode, row: &Row) {
@@ -62,6 +64,9 @@ impl EditorCursor {
             KeyCode::Right => {
                 if self.y < number_of_rows && self.x < row.get_row(self.y).len() {
                     self.x += 1;
+                } else if self.x == number_of_chars && self.y != number_of_rows - 1 {
+                    self.y += 1;
+                    self.x = 0;
                 }
             }
             _ => unimplemented!(),
