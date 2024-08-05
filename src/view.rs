@@ -54,6 +54,8 @@ impl EditorCursor {
             KeyCode::Down => {
                 if self.y < number_of_rows - 1 {
                     self.y += 1;
+                } else {
+                    self.y = number_of_rows - 1;
                 }
             }
 
