@@ -1,4 +1,4 @@
-use std::io::{ self, stdout};
+use std::io::{self, stdout};
 
 pub struct Buffer {
     lines: String,
@@ -20,7 +20,6 @@ impl Buffer {
     }
 }
 
-
 impl std::io::Write for Buffer {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         match std::str::from_utf8(buf) {
@@ -28,7 +27,7 @@ impl std::io::Write for Buffer {
                 self.lines.push_str(string);
                 Ok(string.len())
             }
-            Err(_) => Err(io::ErrorKind::WriteZero.into())
+            Err(_) => Err(io::ErrorKind::WriteZero.into()),
         }
     }
 
